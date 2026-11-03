@@ -1,0 +1,52 @@
+<main id="diary"></main>
+
+<script>
+  const students = [
+    "linda",
+    "garren",
+    "tess",
+    "ryn",
+    "eden",
+    "annie",
+    "anaya",
+    "brianna",
+    "rin",
+    "aadya",
+    "sally",
+    "yufei",
+    "jade",
+    "elaine",
+    "miso"
+  ];
+
+  async function loadDiaries() {
+    const entries = [];
+
+    for (const student of students) {
+      const response = await fetch(`entries/${student}.html`);
+      if (!response.ok) continue;
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      doc.querySelectorAll(".entry").forEach(entry => {
+        entries.push({
+          student,
+          time: entry.querySelector("time")?.textContent || "",
+          text: entry.querySelector("p")?.textContent || ""
+        });
+      });
+    }
+
+    entries.sort((a, b) => a.time.localeCompare(b.time));
+
+    document.getElementById("diary").innerHTML = entries.map(entry => `
+      <article>
+        <strong>${entry.time} — ${entry.student}</strong>
+        <p>${entry.text}</p>
+      </article>
+    `).join("");
+  }
+
+  loadDiaries();
+</script>
